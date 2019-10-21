@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/customborderblue">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+
+        >
+        <LinearLayout
+            android:layout_margin="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/customborderblue">
+
+        <TextView android:id="@+id/simpleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Vehicle Type"
+            android:textSize="20sp"/>
+        <RadioGroup
+            android:id="@+id/vehicleType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="8dp">
+
+            <RadioButton
+                android:id="@+id/twoWheel"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="2-wheeler "
+                android:checked="true"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/customborderblue"/>
+
+            <RadioButton
+                android:id="@+id/fourWheel"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="4-wheeler "
+                android:background="@drawable/customborderblue"/>
+
+        </RadioGroup>
+        </LinearLayout>
+        <!--  Name Label -->
+
+        <EditText
+            android:id="@+id/input_name"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_margin="12dp"
+            android:hint="Vehicle Name"
+            android:inputType="textCapWords"
+            android:textColor="#000"
+            android:textColorHint="#888383"
+            android:textSize="16sp"
+            android:background="@drawable/customborderblue"/>
+
+        <!--  Name Label -->
+
+        <EditText
+            android:id="@+id/input_vnumber"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_margin="10dp"
+            android:hint="Vehicle Registration Number"
+            android:inputType="textVisiblePassword"
+            android:textColor="#000"
+            android:textSize="16sp"
+            android:textColorHint="#888383"
+            android:background="@drawable/customborderblue"/>
+
+        <!-- Signup Button -->
+        <Button
+            android:id="@+id/btn_submit"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:gravity="center"
+            android:padding="12dp"
+            android:textSize="20sp"
+            android:text="Submit"
+            android:textStyle="bold"
+            android:background="@drawable/roundedbutton"
+            android:textColor="#ffff"/>
+        <TextView
+            android:id="@+id/link_addVehicle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:text="Add vehicle"
+            android:textColor="#68a0b0"
+            android:textSize="18sp" />
+        <TextView
+            android:id="@+id/link_Skip"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:text="Skip"
+            android:textColor="#ba160c"
+            android:textSize="18sp"
+            android:onClick="goToHome"/>
+
+
+    </LinearLayout>
+</ScrollView>
