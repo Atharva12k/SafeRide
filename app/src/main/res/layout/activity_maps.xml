@@ -8,17 +8,35 @@
     android:orientation="vertical"
     android:background="@drawable/customborderblue">
 
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="2"
+    android:layout_marginBottom="5dp">
 
 
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
-        map:uiZoomControls="true"
-        android:layout_marginBottom="5dp"/>
+        android:layout_height="match_parent"
+        map:uiZoomControls="true" />
 
+    <Button
+        android:id="@+id/options"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignLeft="@+id/map"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/customborderblue"
+        android:layout_marginBottom="30dp"
+        android:padding="24dp"
+        android:foreground="@android:drawable/ic_menu_manage"
+        android:layout_marginLeft="5dp"
+        android:onClick="optionClick"/>
+
+
+</RelativeLayout>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0dp"

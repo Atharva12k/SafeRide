@@ -1,20 +1,29 @@
 package com.example.ecodrive.saferide;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.core.app.ActivityCompat;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import android.telephony.SmsManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -70,6 +79,8 @@ import androidx.fragment.app.FragmentActivity;
 
 import org.json.JSONObject;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -107,8 +118,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     FirebaseAuth firebaseAuth;
     private GeoPoint geoPoint;
     private HashMap<String,GeoPoint> hashMap;
-    ArrayList<Ambulance> tempList;
-    float[] results;
+    static ArrayList<Responder> tempList;
+    static float[] results;
+    private Context context;
+    final private int REQUEST_SEND_SMS = 123;
+    private boolean accidentDetected;
+    static ArrayList<Responder> EmergencyResponders;
+    private ProgressDialog mProgressDialog;
+    private Timer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +134,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        context = getApplicationContext();
+
+
         firestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -131,10 +152,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mfusedlocationclient = LocationServices.getFusedLocationProviderClient(this);
         vibrateObj = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         hashMap = new HashMap<>();
+        accidentDetected = false;
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setCancelable(true);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        Constants.Token = new ArrayList<>();
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.SEND_SMS}, 123);
         }
         else
         {
@@ -213,11 +239,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startTrackingActivities();
 
     }
-    void callAmbulance()
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_SEND_SMS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(MapsActivity.this,
+                            "Permission Granted", Toast.LENGTH_SHORT).show();
+                    Intent intent = getIntent();
+                    finish();
+                    startActivity(intent);
+
+                } else {
+                    Toast.makeText(MapsActivity.this,
+                            "Permission Denied", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode,
+                        permissions, grantResults);
+        }
+    }
+
+    //Call Responder
+    static void callResponder()
     {
         tempList = new ArrayList<>();
+        EmergencyResponders = new ArrayList<>();
         results = new float[10];
-        firestore.collection("AMBULANCE LIST")
+        FirebaseFirestore.getInstance().collection("RESPONDER LIST")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -226,24 +278,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
                                 GeoPoint tempGeopoint = (GeoPoint) document.getData().get("MyLocation");
-//                              Log.d(TAG,tempMap.get("Ambulence Number") + " :" +tempGeopoint.getLatitude() + ", "+tempGeopoint.getLongitude() );
+//                                Log.d(TAG,tempMap.get("Ambulence Number") + " :" +tempGeopoint.getLatitude() + ", "+tempGeopoint.getLongitude() );
                                 Location.distanceBetween(Constants.CurrentLocation.latitude,Constants.CurrentLocation.longitude,tempGeopoint.getLatitude(),tempGeopoint.getLongitude(),results);
-                                tempList.add(new Ambulance(""+document.getData().get("Ambulence Number"),results[0],""+document.getData().get("Token")));
+//                                Toast.makeText(getBaseContext(),"Responder Name"+document.getData().get(" Name")+" ",Toast.LENGTH_SHORT).show();
+                                tempList.add(new Responder(""+document.getData().get("Responder Number"),results[0],""+document.getData().get("Token")));
                             }
-                            Ambulance closest = new Ambulance("No ambulance",-1.0f,"");
+                            Responder closest = new Responder("No Responder",-1.0f,"");
                             float min = 99999;
-                            //finding closest ambulance
-                            for (Ambulance a: tempList)
-                            {
-                                if(a.distance < min)
-                                {
-                                    min = a.distance;
-                                    closest = new Ambulance(a.AmbulanceNo,min,a.token);
+                            int count = 0;
+                            float minDistance = 500;
+                            //finding closest Emergency Responders
+
+                            while(count==0) {
+                                for (Responder a : tempList) {
+                                    if(a.distance<minDistance)
+                                    {
+                                        EmergencyResponders.add(a);
+                                        count++;
+                                    }
                                 }
+                                minDistance += 500;
                             }
-                            Constants.Token = closest.token;
-                            Toast.makeText(getBaseContext(),"Closest ambulance is :  "+closest.AmbulanceNo+" at "+closest.distance+"m",Toast.LENGTH_LONG).show();
-                            Log.d("Closest Ambnulance","Closest ambulance is : "+closest.AmbulanceNo+" at "+closest.distance+"m Token: "+closest.token);
+//                            for (Responder a: tempList)
+//                            {
+//                                if(a.distance < min)
+//                                {
+//                                    min = a.distance;
+//                                    closest = new Responder(a.ResponderNo,min,a.token);
+//                                }
+//                            }
+//                          Constants.Token = closest.token;
+                            for(Responder a:EmergencyResponders)
+                            {
+                                Constants.Token.add(a.token);
+                                Log.d("Constant token updated","");
+                                String message="There has been an accident around you.\nReach them : ";
+                                message = message.concat("http://maps.google.com/maps?q=loc:" + String.format("%f,%f", Constants.CurrentLocation.latitude , Constants.CurrentLocation.longitude));
+                                Log.d("Emergency message",a.ResponderNo+"  "+message);
+//                                sendMessage(a.ResponderNo,message);
+//                                Toast.makeText(getBaseContext(),"Responder "+a.ResponderNo+" ",Toast.LENGTH_SHORT).show();
+                            }
+
+//                            Toast.makeText(getBaseContext(),"Closest Responder is :  "+closest.ResponderNo+" at "+closest.distance+"m",Toast.LENGTH_LONG).show();
+//                            Log.d("Closest Ambnulance","Closest Responder is : "+closest.ResponderNo+" at "+closest.distance+"m Token: "+closest.token);
 
 
 
@@ -254,14 +331,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
-                            Toast.makeText(getBaseContext(),"Error getting documents: " + task.getException(),Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(getBaseContext(),"Error getting documents: " + task.getException(),Toast.LENGTH_SHORT).show();
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.d(TAG, "Error getting documents: "+ e.getMessage());
-                Toast.makeText(getBaseContext(),"Error getting documents: " + e.getMessage(),Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getBaseContext(),"Error getting documents: " + e.getMessage(),Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -287,8 +364,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         );
     }
 
-    public void startAccelerationService(View view) {
-        if(startstop) {
+    public void startAccelerationService(final View view) {
+        if(startstop)
+        {
             Intent intent = new Intent(MapsActivity.this, AccelerationDetectionService.class);
             startService(intent);
             Button btn = (Button) view;
@@ -300,7 +378,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //AccelerationReceiver
             broadcastReceiverForAcceleration = new BroadcastReceiver() {
                 @Override
-                public void onReceive(Context context, Intent intent) {
+                public synchronized void onReceive(Context context, Intent intent) {
 
                     x = intent.getDoubleExtra("AXIS-X",0);
                     y = intent.getDoubleExtra("AXIS-Y",0);
@@ -311,13 +389,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     double delta = mAccelCurrent - mAccelLast;
                     mAccel = mAccel * 0.9f + delta;
                     double g = (mAccelCurrent / 9.81);
+
                     //if(mAccel > 50){
-                    if(g > 6) {
+                    if(g > 4 && !accidentDetected /*&& Constants.CurrentActivity ==4*/){
+                        //stopping further updates;
+                        accidentDetected = true;
+                        Intent in = new Intent(MapsActivity.this, AccelerationDetectionService.class);
+                        stopService(in);
+                        Button btn = (Button) view;
+                        btn.setText("Start Monitoring");
+                        startstop = true;
                         //Log.d("Change in acceleration", String.valueOf(mAccel));
                         Log. d("Change in acceleration", String.valueOf(g));
 
+                        timer = new Timer(getBaseContext(),mProgressDialog);
+                        timer.execute();
+                        mProgressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel Alert", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                timer.cancel(true);
+                            }
+                        });
+
+                        mProgressDialog.show();
+
                         vibrateObj.vibrate(1000);
-                        callAmbulance();
+//                        callResponder();
+
+
 
                         Toast.makeText(getBaseContext(), "Accident Detected", Toast.LENGTH_SHORT).show();
 
@@ -353,7 +452,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Button btn = (Button) view;
             btn.setText("Start Monitoring");
             startstop = true;
+            accidentDetected = false;
         }
+    }
+
+    static void sendMessage(String phoneNo ,String message)
+    {
+        if(phoneNo!=null) {
+//            Toast.makeText(getBaseContext(),"Emergency contacts informed\n"+message,Toast.LENGTH_SHORT).show();
+            SmsManager sms = SmsManager.getDefault();
+            sms.sendTextMessage(phoneNo, null, message, null, null);
+        }
+    }
+
+    static void informResponder()
+    {
+        FirebaseFirestore.getInstance().collection("USER LIST").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("CONTACT LIST")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d("Contact retrieve", document.getId() + " => " + document.getData());
+                                Map<String,Object> contact = document.getData();
+                                String message="Your friend has been in an accident.\nReach them : ";
+                                message = message.concat("http://maps.google.com/maps?q=loc:" + String.format("%f,%f", Constants.CurrentLocation.latitude , Constants.CurrentLocation.longitude));
+                                String phoneNo = (String)contact.get("PhoneNo");
+                                Log.d("EmgContact",phoneNo);
+                                sendMessage(phoneNo,message);
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
     }
 
     private void handleUserActivity(int type, int confidence) {
@@ -391,12 +524,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 activitiesConfidence[4] = confidence;
                 break;
         }
-        int activty[] = getMax(activitiesConfidence);
-        Constants.CurrentActivity = activty[1];
+        int activity[] = getMax(activitiesConfidence);
+        Constants.CurrentActivity = activity[1];
         /*if (confidence > 75) {
             Toast.makeText(getBaseContext(), "Are you " + activityName + " ?\nConfidence: " + confidence, Toast.LENGTH_SHORT).show();
         }*/
-        updateTextView(Constants.ACTIVITY_NAMES[activty[1]]);
+        updateTextView(Constants.ACTIVITY_NAMES[activity[1]]);
 
     }
 
@@ -497,15 +630,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+    public void optionClick(View view) {
+
+        PopupMenu popup = new PopupMenu(MapsActivity.this, view);
+        //Inflating the Popup using xml file
+        popup.getMenuInflater().inflate(R.menu.options_menu, popup.getMenu());
+
+        //registering popup with OnMenuItemClickListener
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+                if(item.getTitle().equals("Logout")) {
+                    FirebaseAuth.getInstance().signOut();
+                    Intent intent = new Intent(context, LoginActivity.class);
+                    startActivity(intent);
+                    Runtime.getRuntime().exit(0);
+                }
+                else
+                {
+                    Intent i = new Intent(MapsActivity.this,Contacts.class);
+                    startActivity(i);
+                }
+                return true;
+            }
+        });
+
+        popup.show();
+    }
 }
-class Ambulance
+class Responder
 {
-    String AmbulanceNo;
+    String ResponderNo;
     Float distance;
     String token;
 
-    public Ambulance(String ambulanceNo, Float distance, String token) {
-        AmbulanceNo = ambulanceNo;
+    public Responder(String ResponderNo, Float distance, String token) {
+        ResponderNo = ResponderNo;
         this.distance = distance;
         this.token = token;
     }
@@ -517,51 +676,49 @@ class Notify extends AsyncTask<String,Void,Void>
     @Override
     protected Void doInBackground(String... param) {
 
-        token = Constants.Token;
+        for(String token:Constants.Token) {
+//            token = Constants.Token;
 
-        try {
+            try {
 
-            URL url = new URL("https://fcm.googleapis.com/fcm/send");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                URL url = new URL("https://fcm.googleapis.com/fcm/send");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-            conn.setUseCaches(false);
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
+                conn.setUseCaches(false);
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
 
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Authorization","key=AIzaSyDhfU0G8_vLMIfjX5VXEC4K2-rbn-vydfs");
-            conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Authorization", "key=AIzaSyDhfU0G8_vLMIfjX5VXEC4K2-rbn-vydfs");
+                conn.setRequestProperty("Content-Type", "application/json");
 
-            JSONObject json = new JSONObject();
+                JSONObject json = new JSONObject();
 
-            json.put("to", token);
+                json.put("to", token);
 
-            Log.d("SendNotif",Constants.Name+" "+Constants.Email+" "+Constants.CurrentLocation.toString());
-            JSONObject myData = new JSONObject();
-            myData.put("Name",""+Constants.Name);
-            myData.put("Email",""+Constants.Email);
-            myData.put("Location",Constants.CurrentLocation.latitude+","+Constants.CurrentLocation.longitude);
+                Log.d("SendNotif", Constants.Name + " " + Constants.Email + " " + Constants.CurrentLocation.toString());
+                JSONObject myData = new JSONObject();
+                myData.put("Name", "" + Constants.Name);
+                myData.put("Email", "" + Constants.Email);
+                myData.put("Location", Constants.CurrentLocation.latitude + "," + Constants.CurrentLocation.longitude);
 
 
+                JSONObject info = new JSONObject();
+                info.put("title", "Emergency New Request");   // Notification title
+                info.put("body", "There's been accident around you"); // Notification body
 
-            JSONObject info = new JSONObject();
-            info.put("title", "Emergency New Request");   // Notification title
-            info.put("body", "There's been accident around you"); // Notification body
+                json.put("notification", info);
+                json.put("data", myData);
+                Log.d("JSON", json.toString());
+                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+                wr.write(json.toString());
+                wr.flush();
+                conn.getInputStream();
 
-            json.put("notification", info);
-            json.put("data",myData);
-            Log.d("JSON",json.toString());
-            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-            wr.write(json.toString());
-            wr.flush();
-            conn.getInputStream();
-
+            } catch (Exception e) {
+                Log.d("Error", "" + e);
+            }
         }
-        catch (Exception e)
-        {
-            Log.d("Error",""+e);
-        }
-
 
         return null;
     }

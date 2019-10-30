@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:orientation="vertical"
+        android:layout_height="wrap_content"
+        android:background="@drawable/customborderblue">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="QUESTIONAIRE"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:layout_margin="20dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textColor="@color/Blue"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Stuck behind a vehicle, are you driven \nby frustration to overtake ?"
+            android:textSize="16sp"
+            android:background="@drawable/customborderblue"/>
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/rg1"
+            android:layout_height="wrap_content">
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb11"
+                android:text="never"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb12"
+                android:text="hardly"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb13"
+                android:text="occasionally"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb14"
+                android:text="quite often"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb16"
+                android:text="frequently"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb17"
+                android:text=" nearly all the time"/>
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/customborderblue"
+            android:text="Distracted or preoccupied, you realise belatedly that the vehicle ahead has slowed, and
+have to slam on the brakes to avoid a collision ?"
+            android:textSize="16sp"
+            />
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/rg2"
+            android:layout_height="wrap_content">
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb21"
+                android:text="never"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb22"
+                android:text="hardly"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb23"
+                android:text="occasionally"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb24"
+                android:text="quite often"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:id="@+id/rb26"
+                android:layout_height="wrap_content"
+                android:text="frequently"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb27"
+                android:text=" nearly all the time"/>
+        </RadioGroup>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Misjudge the speed of an oncoming vehicle when overtaking ?"
+            android:textSize="16sp"
+            android:background="@drawable/customborderblue"/>
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/rg3"
+            android:layout_height="wrap_content">
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb31"
+
+                android:text="never"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb32"
+                android:text="hardly"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb33"
+                android:text="occasionally"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb34"
+                android:text="quite often"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb36"
+                android:text="frequently"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb37"
+                android:text=" nearly all the time"/>
+        </RadioGroup>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Check your speedometer and discover that you are unknowingly travelling faster
+that the legal limit?"
+            android:textSize="16sp"
+            android:background="@drawable/customborderblue"/>
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/rg4"
+            android:layout_height="wrap_content">
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb41"
+                android:text="never"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb42"
+                android:text="hardly"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb43"
+                android:text="occasionally"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb44"
+                android:text="quite often"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb46"
+                android:text="frequently"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb47"
+                android:text=" nearly all the time"/>
+        </RadioGroup>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fail to read the signs correctly or face any type of visual impairments?"
+            android:textSize="16sp"
+            android:background="@drawable/customborderblue"/>
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/rg5"
+            android:layout_height="wrap_content">
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb51"
+                android:text="never"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb52"
+                android:text="hardly"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb53"
+                android:text="occasionally"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb54"
+                android:text="quite often"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb56"
+                android:text="frequently"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb57"
+                android:text=" nearly all the time"/>
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Drive with only “half an eye” on the road while looking at a map, changing a radio
+channel,?"
+            android:textSize="16sp"
+            android:background="@drawable/customborderblue"/>
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/rg6"
+            android:layout_height="wrap_content">
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:id="@+id/rb61"
+                android:layout_height="wrap_content"
+
+                android:text="never"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb62"
+                android:text="hardly"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:id="@+id/rb63"
+                android:layout_height="wrap_content"
+                android:text="occasionally"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb64"
+                android:text="quite often"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb66"
+                android:text="frequently"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb67"
+                android:text=" nearly all the time"/>
+        </RadioGroup>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="0dp"
+            android:padding="20dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/roundedbutton"
+            android:id="@+id/savedata"
+            android:text="SAVE"/>
+    </LinearLayout>
+</ScrollView>

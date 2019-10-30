@@ -109,7 +109,7 @@
             android:text="Skip"
             android:textColor="#ba160c"
             android:textSize="18sp"
-            android:onClick="goToHome"/>
+            android:onClick="skip"/>
 
 
     </LinearLayout>

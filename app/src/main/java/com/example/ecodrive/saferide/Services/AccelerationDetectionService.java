@@ -108,6 +108,6 @@ public class AccelerationDetectionService extends Service implements SensorEvent
     public void onDestroy() {
         super.onDestroy();
         sensorMan.unregisterListener(this);
-        Toast.makeText(this, "AccelerationDetectionService stopped", Toast.LENGTH_LONG).show();
+//        Toast.makeText(this, "AccelerationDetectionService stopped", Toast.LENGTH_LONG).show();
     }
 }

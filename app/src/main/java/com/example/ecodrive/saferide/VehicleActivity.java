@@ -33,7 +33,6 @@ public class VehicleActivity extends AppCompatActivity {
     RadioButton _twoWheel;
     RadioButton _fourWheel;
     private FirebaseFirestore firestore;
-    private CollectionReference collectionReference;
     private DocumentReference documentReference;
     private HashMap<String,String> hashMap;
     private RadioGroup radioGroup;
@@ -105,13 +104,10 @@ public class VehicleActivity extends AppCompatActivity {
                 }
             });
         }
-
-
-
     }
 
-    public void goToHome(View view) {
-        Intent i = new Intent(VehicleActivity.this,MapsActivity.class);
+    public void skip(View view) {
+        Intent i = new Intent(VehicleActivity.this,Question.class);
         startActivity(i);
     }
 }

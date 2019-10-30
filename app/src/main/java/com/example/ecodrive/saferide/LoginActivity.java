@@ -1,10 +1,14 @@
 package com.example.ecodrive.saferide;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,6 +34,7 @@ public class LoginActivity extends AppCompatActivity {
     static String uid = "";
     public ProgressDialog progressDialog;
     private FirebaseAuth firebaseAuth;
+    private Context context;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,6 +46,7 @@ public class LoginActivity extends AppCompatActivity {
         }
         catch (NullPointerException e){}
         setContentView(R.layout.activity_login);
+        context=getBaseContext();
         firebaseAuth = FirebaseAuth.getInstance();
         _emailText = (EditText) findViewById(R.id.input_email);
         _passwordText = (EditText) findViewById(R.id.input_password);
@@ -73,6 +79,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+
     //Custom Font End
 
     public void login() {
@@ -99,8 +106,6 @@ public class LoginActivity extends AppCompatActivity {
 //        _loginButton.setEnabled(false);
 
     }
-
-
 
 
     @Override
